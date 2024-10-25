@@ -80,6 +80,8 @@ def compare_outputs(filename1, filename2):
                 payload = (value1 ^ value2)
                 payload_bits.append(payload)
                 trigger_input.append(i)
+    print("Payload Comparisons: ")
+    print(payload_bits)
 
 
 """
@@ -113,7 +115,7 @@ def find_trigger_bits(filename1):
 
         # Convert the result to binary string
         binary_nor_result = bin(nor_result)[2:].zfill(max_bit_length)
-        print(binary_nor_result)
+        # print(binary_nor_result)
 
         binary_str = bin(hex)[2:]
         high_bit_positions = []
@@ -129,7 +131,7 @@ def find_trigger_bits(filename1):
         print("The active low trigger bits are", low_bit_positions)
 
 
-gather_hardware_samples("out_trojan.txt") # RUN THESE SEPARATELY. COMMENT 1 OUT
-gather_hardware_samples("out_safe.txt")
+# gather_hardware_samples("out_trojan.txt") # RUN THESE SEPARATELY. COMMENT 1 OUT
+# gather_hardware_samples("out_safe.txt")
 compare_outputs("out_safe.txt","out_trojan.txt")
 find_trigger_bits("inputs.txt")

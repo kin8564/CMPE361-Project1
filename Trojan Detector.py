@@ -2,9 +2,12 @@ import serial
 import random
 
 # Initial testing for Trojans through bitstream output
-input_hex = 10
+c432 = 10       #36 bit input needs 10 hex characters
+c5315 = 46      #178 bit input needs 46 hex characters
+c6288 = 8        #32 bit input needs 8 hex characters
+input_hex = c432 #change for each bitstream
 sample = 100
-com_port = 'COM8'  # TO-DO, change the com port of the FPGA device
+com_port = 'COM6'  # TO-DO, change the com port of the FPGA device
 baud_rate = 115200  # Don't change this
 random_seed = 0
 trigger_input = []
@@ -33,26 +36,26 @@ def gather_hardware_samples(filename):
     ser = serial.Serial(com_port, baud_rate, timeout=1)
     if ser.is_open:
         try:
-                with open(filename, 'w') as file_out:
-                    with open('inputs.txt', 'w') as file_in:
-                        print(f"Connected to {com_port} at {baud_rate} baud\n")
-                        random.seed(random_seed)
-                        for i in range(sample):
-                            data_to_send = generate_random_h_string(input_hex)
-                            file_in.writelines(data_to_send + f"\n")
-                            data_to_send = data_to_send[2:] if data_to_send[0:2] == "0x" else data_to_send
-                            data_bytes = bytes.fromhex(data_to_send)
-                            print(data_to_send)
-                            ser.write(data_bytes)
+            with open(filename, 'w') as file_out:
+                with open('inputs.txt', 'w') as file_in:
+                    print(f"Connected to {com_port} at {baud_rate} baud\n")
+                    random.seed(random_seed)
+                    for i in range(sample):
+                        data_to_send = generate_random_h_string(input_hex)
+                        file_in.writelines(data_to_send + f"\n")
+                        data_to_send = data_to_send[2:] if data_to_send[0:2] == "0x" else data_to_send
+                        data_bytes = bytes.fromhex(data_to_send)
+                        print(data_to_send)
+                        ser.write(data_bytes)
 
-                            # Read data from the FPGA
-                            received_data = ser.read(
-                                16)  # to-do, change the parameter into the number of bytes needed to read from FPGA
-                            # Convert the received bytes to a hexadecimal string
-                            hex_string = ''.join(f'{byte:02X}' for byte in received_data)
-                            print(hex_string)
+                        # Read data from the FPGA
+                        received_data = ser.read(
+                            16)  # to-do, change the parameter into the number of bytes needed to read from FPGA
+                        # Convert the received bytes to a hexadecimal string
+                        hex_string = ''.join(f'{byte:02X}' for byte in received_data)
+                        print(hex_string)
 
-                            file_out.writelines(hex_string + f"\n")
+                        file_out.writelines(hex_string + f"\n")
         except KeyboardInterrupt:
             pass
         finally:
@@ -80,13 +83,14 @@ def compare_outputs(filename1, filename2):
                 payload = (value1 ^ value2)
                 payload_bits.append(payload)
                 trigger_input.append(i)
+    #identify the bits set given a binary number
     print("Payload Comparisons: ")
     print(payload_bits)
 
 
 """
-Finds the active low and high bits for the bitstream. Active high triggers are found by calculating a running xor with
-every trojan input. Active low triggers are found from by calculating a running or for evey trojan input, then
+Finds the active low and high bits for the bitstream. Active high triggers are found by calculating a running XOR with
+every trojan input. Active low triggers are found from by calculating a running OR for evey trojan input, then
 inverting the result.
 Params:
     filename1: 
@@ -95,17 +99,17 @@ def find_trigger_bits(filename1):
     with open(filename1, "r") as input:
         lines = input.readlines()
         trojan_list = []
-        hex = "FFFFFFFFFF"
+        hex = "F" * input_hex
         hex = int(hex, 16)
         for i in trigger_input:
-            trojan_list.append(lines[i][0:10])
+            trojan_list.append(lines[i][0:input_hex])
         for j in trojan_list:
             v1 = int(j,16)
-            hex = v1 & hex
+            hex = v1 & hex      #Find the active high bits via bitwise AND operations
 
         int_values = [int(h, 16) for h in trojan_list]
 
-        # Perform the bitwise OR across all values
+        # Active Low | Perform the bitwise OR across all values
         or_result = int_values[0]
         for val in int_values[1:]:
             or_result |= val

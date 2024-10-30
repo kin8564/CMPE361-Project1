@@ -1,3 +1,4 @@
+import math
 import serial
 import random
 
@@ -81,6 +82,7 @@ def compare_outputs(filename1, filename2):
                 value1 = int(f1_lines[i], 16)
                 value2 = int(f2_lines[i], 16)
                 payload = (value1 ^ value2)
+                payload = math.log2(payload)
                 payload_bits.append(payload)
                 trigger_input.append(i)
     #identify the bits set given a binary number

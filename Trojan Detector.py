@@ -3,12 +3,12 @@ import serial
 import random
 
 # Initial testing for Trojans through bitstream output
-c432 = 10       #36 bit input needs 10 hex characters
-c5315 = 46      #178 bit input needs 46 hex characters
-c6288 = 8        #32 bit input needs 8 hex characters
-input_hex = c432 #change for each bitstream
+c432 = 10           # 36 bit input needs 10 hex characters
+c5315 = 46          # 178 bit input needs 46 hex characters
+c6288 = 8           # 32 bit input needs 8 hex characters
+input_hex = c432    # change for each bitstream
 sample = 100
-com_port = 'COM6'  # TO-DO, change the com port of the FPGA device
+com_port = 'COM6'   #Change the com port of the FPGA device
 baud_rate = 115200  # Don't change this
 random_seed = 0
 trigger_input = []
@@ -27,8 +27,8 @@ def generate_random_h_string(stringLength):
     return ''.join(random.choice(hex_chars) for _ in range(stringLength))
 
 """
-Gathers the sample at x amount and stores them into text files. Function have to be run on two different instance, once
-with the trojan and once without to get the output data based on random inputs.
+Gathers `sample` samples from the FPGA and stores them into text files. Function should be run on two different
+instances, once with the trojan bitstream and once without it. Output for each bitstream is saved separately.
 Param:
     filename: File of resulting output for each input to the bitstream
 """
@@ -91,11 +91,11 @@ def compare_outputs(filename1, filename2):
 
 
 """
-Finds the active low and high bits for the bitstream. Active high triggers are found by calculating a running XOR with
+Finds the active low and high bits for the bitstream. Active high triggers are found by calculating a running AND with
 every trojan input. Active low triggers are found from by calculating a running OR for evey trojan input, then
 inverting the result.
 Params:
-    filename1: 
+    filename1: Trigger inputs
 """
 def find_trigger_bits(filename1):
     with open(filename1, "r") as input:

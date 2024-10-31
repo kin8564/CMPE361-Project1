@@ -15,11 +15,13 @@ This project focuses on detecting hardware Trojans in FPGA devices by analyzing 
 ## Usage
 
 1. Update the `com_port` variable in the code with the correct COM port for your FPGA device.
-2. Run the `gather_hardware_samples` function twice:
-   - First, to gather data from the hardware with the Trojan, using `out_trojan.txt`.
-   - Then, to gather data from the safe hardware, using `out_safe.txt`.
-3. Use the `compare_outputs` function to identify differences between the Trojan and Safe outputs.
-4. Run `find_trigger_bits` to locate active high and low trigger bits responsible for the Trojan behavior.
+2. Change the `input_hex` variable to a known input length, or use the input length of your hardware  
+3. Run the `gather_hardware_samples` function twice:
+   - First, to gather data from the hardware with the Trojan, use `out_trojan.txt`.
+   - Then, to gather data from the safe hardware, use `out_safe.txt`.
+4. Use the `compare_outputs` function to reveal the payload output of the trojan and identify differences between the
+Trojan and Safe output files.
+5. Run `find_trigger_bits` to locate the active high and low trigger bits responsible for the Trojan behavior.
 
 ## Functions
 
@@ -47,7 +49,9 @@ Compares outputs from the Trojan and Safe hardware. Discovers the payload of the
 - `filename2`: File containing Trojan output data.
 
 **Steps:**
-- This function compares the two sets of outputs line by line, identifying differences. It records the XOR result of different outputs in a list of payload bits.
+- This function compares the two sets of outputs line by line, identifying differences.
+The result of a XOR operation between the two outputs reveals the location of the payload bits. The hex input that
+caused the different outputs is recorded, and the payload bits are printed to the user.
 
 ### `find_trigger_bits(filename1)`
 Identifies the active low and high trigger bits for the Trojan input.
@@ -56,7 +60,11 @@ Identifies the active low and high trigger bits for the Trojan input.
 - `filename1`: File containing the input data to analyze.
 
 **Steps:**
-- This function examines the XOR results of the different outputs to find which bits are responsible for triggering the Trojan behavior. It calculates active high and active low trigger bits.
+- The active high trigger bits are found by calculating a bitwise AND result across every known trigger input. A base 
+value of 0xF times the input bit length is used.
+- The active low trigger bits were found across two stages. First, a bitwise OR result was calculated across every known
+trigger input. The result was then inverted, turning the process into a bitwise NOR.
+- Active high and active low triggerr bits are printed to the user.
 
 ## Contributing
 

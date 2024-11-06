@@ -6,8 +6,10 @@ import random
 c432 = 10           # 36 bit input needs 10 hex characters
 c5315 = 46          # 178 bit input needs 46 hex characters
 c6288 = 8           # 32 bit input needs 8 hex characters
-input_hex = c432    # change for each bitstream
-sample = 100
+c499 = 12           # 41 bit input needs 12 hex characters
+c1908 = 10          # 33 bit input needs 10 hex characters
+input_hex = c5315   # change for each bitstream
+sample = 2000
 com_port = 'COM6'   #Change the com port of the FPGA device
 baud_rate = 115200  # Don't change this
 random_seed = 0

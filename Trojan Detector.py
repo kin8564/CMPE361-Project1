@@ -1,6 +1,7 @@
 import math
 import serial
 import random
+import time
 
 # Initial testing for Trojans through bitstream output
 c432 = 10           # 36 bit input needs 10 hex characters
@@ -15,7 +16,9 @@ baud_rate = 115200  # Don't change this
 random_seed = 0
 trigger_input = []
 payload_bits = []
-
+compare_en = False
+gather_safe = False
+gather_trojan = True
 
 """
 Generates a random string of binary inputs to be tested on the hardware.
@@ -139,7 +142,21 @@ def find_trigger_bits(filename1):
         print("The active low trigger bits are", low_bit_positions)
 
 
+start_time = time.time()
+input("Press Enter to stop the stopwatch...")
+
+if gather_safe:
+    gather_hardware_samples("out_safe.txt")
+if gather_trojan:
+    gather_hardware_samples("out_trojan.txt") # RUN THESE SEPARATELY. COMMENT 1 OUT
+if compare_en:
+    compare_outputs("out_safe.txt","out_trojan.txt")
+    find_trigger_bits("inputs.txt")
+
+elapsed_time = time.time() - start_time
+print(f"Elapsed time: {elapsed_time:.2f} seconds")
+
 # gather_hardware_samples("out_trojan.txt") # RUN THESE SEPARATELY. COMMENT 1 OUT
 # gather_hardware_samples("out_safe.txt")
-compare_outputs("out_safe.txt","out_trojan.txt")
-find_trigger_bits("inputs.txt")
+# compare_outputs("out_safe.txt","out_trojan.txt")
+# find_trigger_bits("inputs.txt")
